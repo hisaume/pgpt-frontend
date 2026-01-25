@@ -103,11 +103,11 @@ export default function ChatPane({
     let data: any;
     try {
       // fetch() from the backend
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/chat`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": import.meta.env.VITE_API_KEY,
+          //"X-Api-Key": import.meta.env.VITE_API_KEY,
         },
         body: JSON.stringify({ threadId, messages: threadMessages }),
       });
@@ -128,9 +128,9 @@ export default function ChatPane({
 
     try {
       // Process the backend response
-      const parsedBody =
-        typeof data.body === "string" ? JSON.parse(data.body) : data.body;
-      const assistantContent = parsedBody.assistant?.content;
+      //const parsedBody = typeof data.body === "string" ? JSON.parse(data.body) : data.body;
+      //const assistantContent = parsedBody.assistant?.content;
+      const assistantContent = data.assistant?.content;
 
       if (!assistantContent) {
         console.error("Assistant content is undefined or null.");
