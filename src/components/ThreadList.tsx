@@ -4,6 +4,7 @@
 
 import { useState, useRef } from "react";
 import { load, save } from "../lib/storage";
+import { useClickOutside } from "../lib/useClickOutside";
 import type { Thread } from "../types";
 
 export default function ThreadList({
@@ -14,7 +15,11 @@ export default function ThreadList({
   isMenuOpen: boolean
 }) {
   const [store, setStore] = useState(load());
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useClickOutside(menuRef, () => setOpenMenuId(null));
 
   function createThread() {
     const t: Thread = {
@@ -69,7 +74,7 @@ export default function ThreadList({
         {store.threads.map((t) => (
           <li
             key={t.id}
-            style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}
+            style={{ display: "flex", alignItems: "center", gap: "8px", position: "relative", marginBottom: "8px" }}
           >
             <input
               className="threadInput"
@@ -85,31 +90,87 @@ export default function ThreadList({
               ref={(e) => {
                 inputRefs.current[t.id] = e;
               }}
+              style={{ flex: 1 }}
               tabIndex={isMenuOpen ? 0 : -1}
             />
-            <div
+            <button
+              onClick={() => setOpenMenuId(openMenuId === t.id ? null : t.id)}
               style={{
+                width: "20px",
+                height: "20px",
+                borderRadius: "50%",
+                border: "1px solid #ccc",
+                background: "white",
+                cursor: "pointer",
                 display: "flex",
-                gap: "8px",
-                marginTop: "4px",
-                marginBottom: "4px",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "18px",
+                padding: 0,
               }}
+              tabIndex={isMenuOpen ? 0 : -1}
             >
-              <button
-                onClick={() => onSelect(t.id)}
-                className="minor-button"
-                tabIndex={isMenuOpen ? 0 : -1}
+              <span style={{ transform: "translateY(-1.6px)" }}>⋮</span>
+            </button>
+            {openMenuId === t.id && (
+              <div
+                ref={menuRef}
+                style={{
+                  position: "absolute",
+                  right: "-20px",
+                  top: "20px",
+                  paddingLeft: "5px",
+                  background: "white",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                  zIndex: 1000,
+                  minWidth: "20px",
+                  maxWidth: "50px"
+                }}
               >
-                Open
-              </button>
-              <button
-                onClick={() => deleteThread(t.id)}
-                className="minor-button"
-                tabIndex={isMenuOpen ? 0 : -1}
-              >
-                Delete
-              </button>
-            </div>
+                <button
+                  onClick={() => {
+                    onSelect(t.id);
+                    setOpenMenuId(null);
+                  }}
+                  className="minor-button"
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    border: "none",
+                    borderRadius: 0,
+                    borderBottom: "0px solid #eee",
+                    paddingTop: "0px",
+                    paddingBottom: "4px",
+                    marginTop: "0px",
+                    marginBottom: "0px"
+                  }}
+                  tabIndex={isMenuOpen ? 0 : -1}
+                >
+                  Open
+                </button>
+                <button
+                  onClick={() => {
+                    deleteThread(t.id);
+                    setOpenMenuId(null);
+                  }}
+                  className="minor-button"
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    border: "none",
+                    borderRadius: 0,
+                    borderTop: "0px solid #ca8e17",
+                    paddingTop: "4px",
+                    margin: "0px"
+                  }}
+                  tabIndex={isMenuOpen ? 0 : -1}
+                >
+                  Delete
+                </button>
+              </div>
+            )}
           </li>
         ))}
       </ul>
