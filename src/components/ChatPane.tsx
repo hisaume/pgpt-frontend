@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from "react";
 import { load, save } from "../lib/storage";
 import type { Message } from "../types";
+import ReactMarkdown from "react-markdown";
 
 export default function ChatPane({
   threadId,
@@ -171,7 +172,8 @@ export default function ChatPane({
       >
         {messages.map((m) => (
           <div key={m.id}>
-            <strong>{m.role}:</strong> {m.content}
+            <strong>{m.role}:</strong>
+            <ReactMarkdown>{m.content}</ReactMarkdown>
           </div>
         ))}
       </div>
@@ -200,9 +202,12 @@ export default function ChatPane({
           className="major-button"
           onClick={send}
           disabled={(inputs[threadId]?.trim().length || 0) === 0}
-          style={{ alignSelf: "flex-start", padding: "10px 20px" }}
+          style={{ alignSelf: "flex-start", padding: "10px 15px", fontSize: "16px" }}
         >
-          Send
+          {/*▶*/}
+          <svg width="22" height="22" viewBox="0 0 16 13" fill="currentColor">
+            <path d="M4 2l10 6-10 6V2z" />
+          </svg>
         </button>
       </div>
     </div>
