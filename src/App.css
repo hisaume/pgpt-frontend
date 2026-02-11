@@ -67,7 +67,7 @@
 .minor-button:hover {
   background-color: rgba(0,0,0,0);
   color:  #ff1b1b;
-  outline: 1px solid #dddddd;
+  outline: 0px solid #dddddd;
   outline-offset: 0px;
 }
 
