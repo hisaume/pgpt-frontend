@@ -28,5 +28,7 @@ dist-ssr
 
 # My own docs
 /docs/
-
 coverage/
+TODO.txt
+TODO.md
+
