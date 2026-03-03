@@ -12,8 +12,10 @@ export default function PresetList(
 ) {
   const [store, setStore] = useState(load());
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [editingPresetId, setEditingPresetId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
+  const presetInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const menuRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(menuRef, () => setOpenMenuId(null));
@@ -42,6 +44,19 @@ export default function PresetList(
     };
     setStore(next);
     save(next);
+    setEditingPresetId(null);
+  }
+
+  function enterEditMode(id: string) {
+    setEditingPresetId(id);
+    setOpenMenuId(null);
+    setTimeout(() => {
+      const input = presetInputRefs.current[id];
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }, 0);
   }
 
   function deletePreset(id: string) {
@@ -91,8 +106,37 @@ export default function PresetList(
             <input
               className="threadInput"
               defaultValue={p.title}
-              onBlur={(e) => updatePreset(p.id, { title: e.target.value })}
-              style={{ flex: 1 }}
+              readOnly={editingPresetId !== p.id}
+              onClick={() => {
+                if (editingPresetId !== p.id) {
+                  onAppend(p.text);
+                }
+              }}
+              onBlur={(e) => {
+                if (editingPresetId === p.id) {
+                  updatePreset(p.id, { title: e.target.value });
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && editingPresetId === p.id) {
+                  const input = e.currentTarget as HTMLInputElement;
+                  input.setSelectionRange(0, 0);
+                  input.blur();
+                } else if (e.key === "Escape" && editingPresetId === p.id) {
+                  const input = e.currentTarget as HTMLInputElement;
+                  input.value = p.title;
+                  input.setSelectionRange(0, 0);
+                  setEditingPresetId(null);
+                  input.blur();
+                }
+              }}
+              ref={(e) => {
+                presetInputRefs.current[p.id] = e;
+              }}
+              style={{ 
+                flex: 1,
+                cursor: editingPresetId === p.id ? "text" : "pointer"
+              }}
               tabIndex={isMenuOpen ? 0 : -1}
             />
             <button
@@ -128,13 +172,12 @@ export default function PresetList(
                   boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                   zIndex: 1000,
                   minWidth: "20px",
-                  maxWidth: "50px"
+                  maxWidth: "55px"
                 }}
               >
                 <button
                   onClick={() => {
-                    onAppend(p.text);
-                    setOpenMenuId(null);
+                    enterEditMode(p.id);
                   }}
                   className="minor-button"
                   style={{
@@ -150,7 +193,7 @@ export default function PresetList(
                   }}
                   tabIndex={isMenuOpen ? 0 : -1}
                 >
-                  Use
+                  Rename
                 </button>
                 <button
                   onClick={() => {
