@@ -16,6 +16,7 @@ export default function ThreadList({
 }) {
   const [store, setStore] = useState(load());
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -40,6 +41,7 @@ export default function ThreadList({
   }
 
   function renameThread(id: string, title: string) {
+    // Set title in store
     setStore((prev) => {
       const next = {
         ...prev,
@@ -50,6 +52,19 @@ export default function ThreadList({
       save(next);
       return next;
     });
+    setEditingThreadId(null);
+  }
+
+  function enterEditMode(id: string) {
+    setEditingThreadId(id);
+    setOpenMenuId(null);
+    setTimeout(() => {
+      const input = inputRefs.current[id];
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }, 0);
   }
 
   function deleteThread(id: string) {
@@ -79,18 +94,37 @@ export default function ThreadList({
             <input
               className="threadInput"
               defaultValue={t.title}
-              onBlur={(e) =>
-                renameThread(t.id, (e.target as HTMLInputElement).value)
-              }
+              readOnly={editingThreadId !== t.id}
+              onClick={() => {
+                if (editingThreadId !== t.id) {
+                  onSelect(t.id);
+                }
+              }}
+              onBlur={(e) => {
+                if (editingThreadId === t.id) {
+                  renameThread(t.id, (e.target as HTMLInputElement).value);
+                }
+              }}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  (e.currentTarget as HTMLInputElement).blur();
+                if (e.key === "Enter" && editingThreadId === t.id) {
+                  const input = e.currentTarget as HTMLInputElement;
+                  input.setSelectionRange(0, 0);
+                  input.blur();
+                } else if (e.key === "Escape" && editingThreadId === t.id) {
+                  const input = e.currentTarget as HTMLInputElement;
+                  input.value = t.title;
+                  input.setSelectionRange(0, 0);
+                  setEditingThreadId(null);
+                  input.blur();
                 }
               }}
               ref={(e) => {
                 inputRefs.current[t.id] = e;
               }}
-              style={{ flex: 1 }}
+              style={{ 
+                flex: 1,
+                cursor: editingThreadId === t.id ? "text" : "pointer"
+              }}
               tabIndex={isMenuOpen ? 0 : -1}
             />
             <button
@@ -126,13 +160,12 @@ export default function ThreadList({
                   boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                   zIndex: 1000,
                   minWidth: "20px",
-                  maxWidth: "50px"
+                  maxWidth: "55px"
                 }}
               >
                 <button
                   onClick={() => {
-                    onSelect(t.id);
-                    setOpenMenuId(null);
+                    enterEditMode(t.id);
                   }}
                   className="minor-button"
                   style={{
@@ -148,7 +181,7 @@ export default function ThreadList({
                   }}
                   tabIndex={isMenuOpen ? 0 : -1}
                 >
-                  Open
+                  Rename
                 </button>
                 <button
                   onClick={() => {
