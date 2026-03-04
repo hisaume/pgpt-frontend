@@ -105,6 +105,12 @@ export default function ThreadList({
                   renameThread(t.id, (e.target as HTMLInputElement).value);
                 }
               }}
+              onMouseDown={(e) => {
+                // Prevent text selection when inactive
+                if (editingThreadId !== t.id) {
+                  e.preventDefault();
+                }
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && editingThreadId === t.id) {
                   const input = e.currentTarget as HTMLInputElement;
@@ -133,8 +139,8 @@ export default function ThreadList({
                 width: "20px",
                 height: "20px",
                 borderRadius: "50%",
-                border: "1px solid #ccc",
-                background: "white",
+                border: "none",
+                background: "none",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
@@ -144,7 +150,18 @@ export default function ThreadList({
               }}
               tabIndex={isMenuOpen ? 0 : -1}
             >
-              <span style={{ transform: "translateY(-1.6px)" }}>⋮</span>
+              <span style={{
+                display: "flex",
+                flexDirection: "column",
+                fontSize: "10px",
+                lineHeight: "4px",
+                transform: "translateY(0px)"
+              }}>
+                <span>•</span>
+                <span>•</span>
+                <span>•</span>
+              </span>
+
             </button>
             {openMenuId === t.id && (
               <div
