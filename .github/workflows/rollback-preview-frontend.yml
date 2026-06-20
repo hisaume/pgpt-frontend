@@ -1,0 +1,54 @@
+name: Rollback Preview Frontend
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Workflow run ID containing preview-dist-artifacts"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  rollback-preview:
+    name: Rollback Preview Frontend
+    runs-on: ubuntu-latest
+    environment: preview
+
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      S3_BUCKET: ${{ vars.S3_BUCKET }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+
+    steps:
+      - name: Download Previous Preview Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: preview-dist-artifacts
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+          path: ./rollback-dist
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6.1.0
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: frontend-preview-rollback
+
+      - name: Deploy Rollback Artifact to Preview S3
+        run: aws s3 sync ./rollback-dist "s3://${S3_BUCKET}" --delete
+
+      - name: Invalidate Preview CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${CLOUDFRONT_DISTRIBUTION_ID}" \
+            --paths "/*"
