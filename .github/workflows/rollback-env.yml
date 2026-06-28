@@ -1,0 +1,69 @@
+name: Rollback Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "GitHub Environment to roll back"
+        required: true
+        type: environment
+      run_id:
+        description: "Workflow run ID containing the frontend artifact"
+        required: true
+        type: string
+
+  workflow_call:
+    inputs:
+      environment:
+        description: "GitHub Environment to roll back"
+        required: true
+        type: string
+      run_id:
+        description: "Workflow run ID containing the frontend artifact"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  rollback:
+    name: Rollback Frontend ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      S3_BUCKET: ${{ vars.S3_BUCKET }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+
+    steps:
+      - name: Download Previous Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.environment }}-dist-artifacts
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+          path: ./dist
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: frontend-${{ inputs.environment }}-rollback
+
+      - name: Deploy Rollback Artifact to S3
+        run: aws s3 sync ./dist "s3://${S3_BUCKET}" --delete
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${CLOUDFRONT_DISTRIBUTION_ID}" \
+            --paths "/*"
