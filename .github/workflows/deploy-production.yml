@@ -1,16 +1,14 @@
-name: Deploy Preview Frontend
+name: Deploy Production Frontend
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
 
 permissions:
   contents: read
   id-token: write
 
 jobs:
-  deploy-preview:
+  deploy-production:
     uses: ./.github/workflows/deploy-env.yml
     with:
-      environment: preview
+      environment: production
