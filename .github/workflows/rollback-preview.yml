@@ -1,0 +1,21 @@
+name: Rollback Preview Frontend
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Workflow run ID containing the preview artifact"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+
+jobs:
+  rollback-preview:
+    uses: ./.github/workflows/rollback-env.yml
+    with:
+      environment: preview
+      run_id: ${{ inputs.run_id }}
