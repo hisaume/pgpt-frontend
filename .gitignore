@@ -22,14 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Vite
-.env
+AGENTS.md
 
 # My own docs
-/docs/
+docs/
 coverage/
 TODO.txt
 TODO.md
+.env
 
 _old/

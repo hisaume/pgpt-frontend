@@ -8,7 +8,11 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "jest"
+    "test": "jest",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc -b",
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm test"
   },
   "dependencies": {
     "react": "^19.2.0",
@@ -28,6 +32,7 @@
     "globals": "^16.5.0",
     "jest": "^30.2.0",
     "jest-localstorage-mock": "^2.4.26",
+    "prettier": "^3.9.6",
     "ts-jest": "^29.4.5",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.3",
