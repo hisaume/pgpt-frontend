@@ -14,8 +14,11 @@ export interface Store {
 const empty: Store = { threads: [], messages: [], presets: [] };
 
 export function load(): Store {
-  try { return JSON.parse(localStorage.getItem(KEY) || "") || empty; }
-  catch { return empty; }
+  try {
+    return JSON.parse(localStorage.getItem(KEY) || "") || empty;
+  } catch {
+    return empty;
+  }
 }
 export function save(store: Store) {
   localStorage.setItem(KEY, JSON.stringify(store));

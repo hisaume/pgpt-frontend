@@ -11,8 +11,8 @@ export default function ThreadList({
   onSelect,
   isMenuOpen,
 }: {
-  onSelect: (id: string) => void,
-  isMenuOpen: boolean
+  onSelect: (id: string) => void;
+  isMenuOpen: boolean;
 }) {
   const [store, setStore] = useState(load());
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -46,7 +46,7 @@ export default function ThreadList({
       const next = {
         ...prev,
         threads: prev.threads.map((t) =>
-          t.id === id ? { ...t, title, updatedAt: Date.now() } : t
+          t.id === id ? { ...t, title, updatedAt: Date.now() } : t,
         ),
       };
       save(next);
@@ -89,7 +89,13 @@ export default function ThreadList({
         {store.threads.map((t) => (
           <li
             key={t.id}
-            style={{ display: "flex", alignItems: "center", gap: "8px", position: "relative", marginBottom: "8px" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              position: "relative",
+              marginBottom: "8px",
+            }}
           >
             <input
               className="threadInput"
@@ -127,9 +133,9 @@ export default function ThreadList({
               ref={(e) => {
                 inputRefs.current[t.id] = e;
               }}
-              style={{ 
+              style={{
                 flex: 1,
-                cursor: editingThreadId === t.id ? "text" : "pointer"
+                cursor: editingThreadId === t.id ? "text" : "pointer",
               }}
               tabIndex={isMenuOpen ? 0 : -1}
             />
@@ -150,18 +156,19 @@ export default function ThreadList({
               }}
               tabIndex={isMenuOpen ? 0 : -1}
             >
-              <span style={{
-                display: "flex",
-                flexDirection: "column",
-                fontSize: "10px",
-                lineHeight: "4px",
-                transform: "translateY(0px)"
-              }}>
+              <span
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  fontSize: "10px",
+                  lineHeight: "4px",
+                  transform: "translateY(0px)",
+                }}
+              >
                 <span>•</span>
                 <span>•</span>
                 <span>•</span>
               </span>
-
             </button>
             {openMenuId === t.id && (
               <div
@@ -177,7 +184,7 @@ export default function ThreadList({
                   boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                   zIndex: 1000,
                   minWidth: "20px",
-                  maxWidth: "55px"
+                  maxWidth: "55px",
                 }}
               >
                 <button
@@ -194,7 +201,7 @@ export default function ThreadList({
                     paddingTop: "0px",
                     paddingBottom: "4px",
                     marginTop: "0px",
-                    marginBottom: "0px"
+                    marginBottom: "0px",
                   }}
                   tabIndex={isMenuOpen ? 0 : -1}
                 >
@@ -213,7 +220,7 @@ export default function ThreadList({
                     borderRadius: 0,
                     borderTop: "0px solid #ca8e17",
                     paddingTop: "4px",
-                    margin: "0px"
+                    margin: "0px",
                   }}
                   tabIndex={isMenuOpen ? 0 : -1}
                 >

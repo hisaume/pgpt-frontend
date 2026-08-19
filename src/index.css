@@ -13,7 +13,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   overflow: hidden; /* Prevent scrolling at the document level */
@@ -27,7 +28,7 @@ body {
 }
 
 textarea {
-  font-family: inherit; 
+  font-family: inherit;
 }
 
 input {
@@ -35,7 +36,7 @@ input {
 }
 
 button {
-  font-family: inherit; 
+  font-family: inherit;
 }
 
 @media (prefers-color-scheme: light) {
@@ -44,4 +45,3 @@ button {
     background-color: #ffffff;
   }
 }
-

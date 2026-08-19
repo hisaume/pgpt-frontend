@@ -2,10 +2,26 @@
     messages display, composer, send
 */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { load, save } from "../lib/storage";
 import type { Message } from "../types";
 import ReactMarkdown from "react-markdown";
+
+/*
+  Expected response shape:
+  data = {
+    assistant: {
+      role: "assistant",
+      content: "Hello"
+    }
+  }
+*/
+interface BackendResponse {
+  assistant: {
+    role: string;
+    content: string;
+  };
+}
 
 export default function ChatPane({
   threadId,
@@ -13,10 +29,10 @@ export default function ChatPane({
   presetTrigger,
   onFocus,
 }: {
-  threadId: string,
-  presetAppend?: string,
-  presetTrigger: number, // Trigger for the preset use
-  onFocus?: () => void
+  threadId: string;
+  presetAppend?: string;
+  presetTrigger: number; // Trigger for the preset use
+  onFocus?: () => void;
 }) {
   const [store, setStore] = useState(load());
   const [inputs, setInputs] = useState<Record<string, string>>({}); // 1 user input per threadId
@@ -24,30 +40,34 @@ export default function ChatPane({
 
   const messages = store.messages.filter((m) => m.threadId === threadId);
 
+  // threadId has changed. Maybe a new thread, or thread switching.
   useEffect(() => {
-    // Ensure there's an input entry for the current threadId
-    if (!inputs[threadId]) {
-      setInputs((prev) => ({
-        ...prev,
-        [threadId]: "", // Initialize input for the new threadId if not already set
-      }));
-    }
+    setInputs((previousInputs) => {     
+      if (threadId in previousInputs) {
+        return previousInputs; // Save the existing input if threadId already exists.
+      }
+      return { ...previousInputs, [threadId]: "" }; // Create an empty input for the threadId.
+    });
   }, [threadId]);
 
-  // NOTE: the space is added here before the preset text.
-  useEffect(() => {
-    if (presetAppend) {
-      setInputs((prev) => ({
-        ...prev,
-        [threadId]: `${prev[threadId] || ""}${prev[threadId] ? " " : ""}${presetAppend}`,
-      }));
-    }
-  }, [presetTrigger]); // Listen for preset use trigger
+  const appendPreset = useEffectEvent(() => {
+    if (!presetAppend) return;
+    setInputs((prev) => ({
+      ...prev,
+      // If user text exists, preserve it then add space before appending.
+      [threadId]: `${prev[threadId] || ""}${prev[threadId] ? " " : ""}${presetAppend}`
+    }));
+  });
 
-  useEffect( () => {
+  useEffect(() => {
+    appendPreset();
+  }, [presetTrigger]);
+
+  useEffect(() => {
     // Scroll to the bottom
     if (messageContainerRef.current) {
-      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+      messageContainerRef.current.scrollTop =
+        messageContainerRef.current.scrollHeight;
     }
   }, [messages]); // When messages get updated, need to scroll
 
@@ -101,7 +121,7 @@ export default function ChatPane({
     setInputs((prev) => ({ ...prev, [threadId]: "" }));
     // TODO ?: Consider locking the send button here?
 
-    let data: any;
+    let data: BackendResponse | null = null;
     try {
       // fetch() from the backend
       const response = await fetch(`${import.meta.env.VITE_API_URL}`, {
@@ -114,40 +134,42 @@ export default function ChatPane({
       });
 
       if (!response.ok) {
-        throw new Error(`Backend error: ${response.status} ${response.statusText}`);
+        if( response.status === 504) {
+          addMessage("assistant", `⚠️ Error: Backend timed out (504).`);
+          return; // Exit early if the backend times out
+        }
+        throw new Error(
+          `Backend error: ${response.status} ${response.statusText}`,
+        );
       }
-
       data = await response.json();
+      if (!data || !data.assistant) {
+        addMessage("assistant", "⚠️ Error: Backend response data (or .assistant) is missing.");
+        return; // Exit early if the backend response is malformed
+      }
       console.log("Backend response data:", data);
-      if (data.errorType === "Sandbox.Timeout")
-        addMessage("assistant", `⚠️ Error: Timed out.`);
-    } catch (err: any) {
-      console.error("Error during backend fetch:", err);
-      addMessage("assistant", `⚠️ Error: Could not reach backend. ${err.message}`);
+    } catch (err) {
+      const error = err as Error;
+      addMessage("assistant", `⚠️ Error: Could not reach backend. ${error.message}`);
       return; // Exit early if the fetch fails
     }
 
     try {
       // Process the backend response
-      //const parsedBody = typeof data.body === "string" ? JSON.parse(data.body) : data.body;
-      //const assistantContent = parsedBody.assistant?.content;
       const assistantContent = data.assistant?.content;
 
       if (!assistantContent) {
         console.error("Assistant content is undefined or null.");
         addMessage(
           "assistant",
-          `⚠️ Parse Error: Assistant content is undefined or null.`
+          `⚠️ Parse Error: Assistant content is undefined or null.`,
         );
       } else {
         addMessage("assistant", assistantContent);
       }
-    } catch (err: any) {
-      // Show an error message in the chat
-      addMessage(
-        "assistant",
-        `⚠️ Error: Failed to process backend response. ${err.message}`
-      );
+    } catch (err) {
+      const error = err as Error;
+      addMessage("assistant", `⚠️ Error: Failed to process backend response. ${error.message}`);
     }
   }
 
@@ -202,7 +224,11 @@ export default function ChatPane({
           className="major-button"
           onClick={send}
           disabled={(inputs[threadId]?.trim().length || 0) === 0}
-          style={{ alignSelf: "flex-start", padding: "10px 15px", fontSize: "16px" }}
+          style={{
+            alignSelf: "flex-start",
+            padding: "10px 15px",
+            fontSize: "16px",
+          }}
         >
           {/*▶*/}
           <svg width="22" height="22" viewBox="0 0 16 13" fill="currentColor">

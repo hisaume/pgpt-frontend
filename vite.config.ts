@@ -1,13 +1,25 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+/// <reference types="vitest/config" />
 
-// https://vite.dev/config/
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+
 export default defineConfig({
   plugins: [react()],
-  base: './',
+  base: "./",
   build: {
-    sourcemap: true, // Ensure source maps are generated for production builds
-    outDir: 'dist',
+    sourcemap: true,
+    outDir: "dist",
     emptyOutDir: true,
+  },
+  test: {
+    environment: "jsdom",
+    environmentOptions: {
+      jsdom: {
+        url: "http://localhost/",
+      },
+    },
+    coverage: {
+      provider: "v8",
+    },
   },
 });

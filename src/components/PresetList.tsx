@@ -7,9 +7,13 @@ import { load, save } from "../lib/storage";
 import { useClickOutside } from "../lib/useClickOutside";
 import type { Preset } from "../types";
 
-export default function PresetList(
-  { onAppend, isMenuOpen }: { onAppend: (text: string) => void, isMenuOpen: boolean }
-) {
+export default function PresetList({
+  onAppend,
+  isMenuOpen,
+}: {
+  onAppend: (text: string) => void;
+  isMenuOpen: boolean;
+}) {
   const [store, setStore] = useState(load());
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [editingPresetId, setEditingPresetId] = useState<string | null>(null);
@@ -39,7 +43,7 @@ export default function PresetList(
     const next = {
       ...store,
       presets: store.presets.map((p) =>
-        p.id === id ? { ...p, ...patch, updatedAt: Date.now() } : p
+        p.id === id ? { ...p, ...patch, updatedAt: Date.now() } : p,
       ),
     };
     setStore(next);
@@ -60,7 +64,10 @@ export default function PresetList(
   }
 
   function deletePreset(id: string) {
-    const next = { ...store, presets: store.presets.filter((p) => p.id !== id) };
+    const next = {
+      ...store,
+      presets: store.presets.filter((p) => p.id !== id),
+    };
     setStore(next);
     save(next);
   }
@@ -84,7 +91,12 @@ export default function PresetList(
           placeholder="Prompt you want to save"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          style={{ display: "block", margin: "0 auto", marginBottom: "8px", resize: "vertical" }}
+          style={{
+            display: "block",
+            margin: "0 auto",
+            marginBottom: "8px",
+            resize: "vertical",
+          }}
           tabIndex={isMenuOpen ? 0 : -1}
         />
 
@@ -102,7 +114,16 @@ export default function PresetList(
 
       <ul>
         {store.presets.map((p) => (
-          <li key={p.id} style={{ display: "flex", alignItems: "center", gap: "8px", position: "relative", marginBottom: "8px" }}>
+          <li
+            key={p.id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              position: "relative",
+              marginBottom: "8px",
+            }}
+          >
             <input
               className="threadInput"
               defaultValue={p.title}
@@ -139,9 +160,9 @@ export default function PresetList(
               ref={(e) => {
                 presetInputRefs.current[p.id] = e;
               }}
-              style={{ 
+              style={{
                 flex: 1,
-                cursor: editingPresetId === p.id ? "text" : "pointer"
+                cursor: editingPresetId === p.id ? "text" : "pointer",
               }}
               tabIndex={isMenuOpen ? 0 : -1}
             />
@@ -162,13 +183,15 @@ export default function PresetList(
               }}
               tabIndex={isMenuOpen ? 0 : -1}
             >
-              <span style={{
-                display: "flex",
-                flexDirection: "column",
-                fontSize: "10px",
-                lineHeight: "4px",
-                transform: "translateY(0px)"
-              }}>
+              <span
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  fontSize: "10px",
+                  lineHeight: "4px",
+                  transform: "translateY(0px)",
+                }}
+              >
                 <span>•</span>
                 <span>•</span>
                 <span>•</span>
@@ -188,7 +211,7 @@ export default function PresetList(
                   boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                   zIndex: 1000,
                   minWidth: "20px",
-                  maxWidth: "55px"
+                  maxWidth: "55px",
                 }}
               >
                 <button
@@ -205,7 +228,7 @@ export default function PresetList(
                     paddingTop: "0px",
                     paddingBottom: "4px",
                     marginTop: "0px",
-                    marginBottom: "0px"
+                    marginBottom: "0px",
                   }}
                   tabIndex={isMenuOpen ? 0 : -1}
                 >
@@ -224,7 +247,7 @@ export default function PresetList(
                     borderRadius: 0,
                     borderTop: "0px solid #ca8e17",
                     paddingTop: "4px",
-                    margin: "0px"
+                    margin: "0px",
                   }}
                   tabIndex={isMenuOpen ? 0 : -1}
                 >
