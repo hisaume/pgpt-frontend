@@ -42,7 +42,7 @@ export default function ChatPane({
 
   // threadId has changed. Maybe a new thread, or thread switching.
   useEffect(() => {
-    setInputs((previousInputs) => {     
+    setInputs((previousInputs) => {
       if (threadId in previousInputs) {
         return previousInputs; // Save the existing input if threadId already exists.
       }
@@ -55,7 +55,7 @@ export default function ChatPane({
     setInputs((prev) => ({
       ...prev,
       // If user text exists, preserve it then add space before appending.
-      [threadId]: `${prev[threadId] || ""}${prev[threadId] ? " " : ""}${presetAppend}`
+      [threadId]: `${prev[threadId] || ""}${prev[threadId] ? " " : ""}${presetAppend}`,
     }));
   });
 
@@ -134,7 +134,7 @@ export default function ChatPane({
       });
 
       if (!response.ok) {
-        if( response.status === 504) {
+        if (response.status === 504) {
           addMessage("assistant", `⚠️ Error: Backend timed out (504).`);
           return; // Exit early if the backend times out
         }
@@ -144,13 +144,19 @@ export default function ChatPane({
       }
       data = await response.json();
       if (!data || !data.assistant) {
-        addMessage("assistant", "⚠️ Error: Backend response data (or .assistant) is missing.");
+        addMessage(
+          "assistant",
+          "⚠️ Error: Backend response data (or .assistant) is missing.",
+        );
         return; // Exit early if the backend response is malformed
       }
       console.log("Backend response data:", data);
     } catch (err) {
       const error = err as Error;
-      addMessage("assistant", `⚠️ Error: Could not reach backend. ${error.message}`);
+      addMessage(
+        "assistant",
+        `⚠️ Error: Could not reach backend. ${error.message}`,
+      );
       return; // Exit early if the fetch fails
     }
 
@@ -169,7 +175,10 @@ export default function ChatPane({
       }
     } catch (err) {
       const error = err as Error;
-      addMessage("assistant", `⚠️ Error: Failed to process backend response. ${error.message}`);
+      addMessage(
+        "assistant",
+        `⚠️ Error: Failed to process backend response. ${error.message}`,
+      );
     }
   }
 
