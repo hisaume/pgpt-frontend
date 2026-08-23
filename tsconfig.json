@@ -1,14 +1,4 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "types": ["jest"],
-    "outDir": "./dist"
-  },
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },

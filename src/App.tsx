@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import ThreadList from "./components/ThreadList";
 import PresetList from "./components/PresetList";
 import ChatPane from "./components/ChatPane";
-import './App.css'
+import "./App.css";
 
 export default function App() {
   const [threadId, setThreadId] = useState<string | null>(null);
@@ -17,14 +17,22 @@ export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // State to toggle the left pane
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
 
-  useEffect(() => { // Check this later if it's sensible on phones
+  useEffect(() => {
+    // Check this later if it's sensible on phones
     const updateHeight = () => setViewportHeight(window.innerHeight); // Dynamically update the height
     window.addEventListener("resize", updateHeight);
     return () => window.removeEventListener("resize", updateHeight);
   }, []);
 
   return (
-    <div style={{ height: `${viewportHeight}px`, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div
+      style={{
+        height: `${viewportHeight}px`,
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
       {/* Top strip */}
       <div className="app-title-bar">
         <button
@@ -33,16 +41,24 @@ export default function App() {
           aria-label="Menu button"
           style={{
             padding: "0px 0px",
-            cursor: "pointer" }}
+            cursor: "pointer",
+          }}
         >
           <span className="hamburger-bar"></span>
         </button>
         <div className="app-title">PromptGPT</div>
-        <div style={{ fontSize: "12px", color: "#30498dff" }}>v1.3 CF</div>
+        <div style={{ fontSize: "12px", color: "#30498dff" }}>v0.26.0814</div>
       </div>
 
       {/* Bottom pane */}
-      <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr", overflow: "hidden" }}>
+      <div
+        style={{
+          flex: 1,
+          display: "grid",
+          gridTemplateColumns: "1fr",
+          overflow: "hidden",
+        }}
+      >
         {/* Left pane: ThreadList and PresetList */}
         <div
           className="left-pane"
@@ -79,32 +95,49 @@ export default function App() {
             &times;
           </button>
 
-          <ThreadList onSelect={id => setThreadId(id)}
-                      isMenuOpen={isMenuOpen}
+          <ThreadList
+            onSelect={(id) => setThreadId(id)}
+            isMenuOpen={isMenuOpen}
           />
-          <PresetList onAppend={(text) => {
-                        setPresetTrigger((prev) => prev + 1); // Increment trigger
-                        setPresetAppend(text);
-                      }}
-                      isMenuOpen={isMenuOpen}
+          <PresetList
+            onAppend={(text) => {
+              setPresetTrigger((prev) => prev + 1); // Increment trigger
+              setPresetAppend(text);
+            }}
+            isMenuOpen={isMenuOpen}
           />
         </div>
 
         {/* Right pane */}
-        <div style={{ height: "100%", width: "100%",
-                      overflowY: "auto", display: "flex", flexDirection: "column" }}>
-          {threadId ?
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            overflowY: "auto",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {threadId ? (
             <ChatPane
               threadId={threadId}
               presetAppend={presetAppend}
               presetTrigger={presetTrigger} // Pass the trigger
               onFocus={() => setIsMenuOpen(false)} // Collapse the left pane when ChatPane gains focus
             />
-            :
-            <div style={{ display: "flex", justifyContent: "center",
-                          alignItems: "center", height: "100%", width: "100%",
-            }}>Select or create a thread</div>
-          }
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+                width: "100%",
+              }}
+            >
+              Select or create a thread
+            </div>
+          )}
         </div>
       </div>
     </div>
