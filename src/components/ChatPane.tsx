@@ -4,8 +4,10 @@
 
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { load, save } from "../lib/storage";
+import { useCopyToClipboard } from "../lib/useCopyToClipboard";
 import type { Message } from "../types";
-import ReactMarkdown from "react-markdown";
+import MarkdownMessage from "./MarkdownMessage";
+import "./ChatPane.css";
 
 /*
   Expected response shape:
@@ -21,6 +23,24 @@ interface BackendResponse {
     role: string;
     content: string;
   };
+}
+
+function AssistantMessage({ content }: { content: string }) {
+  const { copied, copy } = useCopyToClipboard();
+  return (
+    <div className="chat-message-assistant">
+      <MarkdownMessage content={content} />
+      <div className="message-actions">
+        <button
+          type="button"
+          className="message-copy"
+          onClick={() => copy(content)}
+        >
+          {copied ? "Copied" : "Copy"}
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export default function ChatPane({
@@ -128,7 +148,7 @@ export default function ChatPane({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          //"X-Api-Key": import.meta.env.VITE_API_KEY,
+          "X-Api-Key": import.meta.env.VITE_API_KEY,
         },
         body: JSON.stringify({ threadId, messages: threadMessages }),
       });
@@ -201,12 +221,15 @@ export default function ChatPane({
         }}
         tabIndex={-1}
       >
-        {messages.map((m) => (
-          <div key={m.id}>
-            <strong>{m.role}:</strong>
-            <ReactMarkdown>{m.content}</ReactMarkdown>
-          </div>
-        ))}
+        {messages.map((m) =>
+          m.role === "user" ? (
+            <div key={m.id} className="chat-bubble chat-bubble-user">
+              {m.content}
+            </div>
+          ) : (
+            <AssistantMessage key={m.id} content={m.content} />
+          ),
+        )}
       </div>
       <div
         style={{
