@@ -26,6 +26,42 @@
   margin-bottom: 12px;
 }
 
+/* Bouncing-dots "assistant is thinking" placeholder, shown before the first token arrives. */
+.typing-indicator {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.typing-indicator span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--typing-dot-color, #999);
+  animation: typing-bounce 1.2s infinite ease-in-out both;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing-bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 .message-actions {
   opacity: 0;
   transition: opacity 0.1s;
@@ -160,6 +196,10 @@
 
   .message-copy {
     --message-copy-color: #aaa;
+  }
+
+  .typing-indicator span {
+    --typing-dot-color: #777;
   }
 
   .markdown-content blockquote {
