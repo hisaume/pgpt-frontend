@@ -1,0 +1,203 @@
+/*
+    ChatPane.css — chat bubble layout, markdown content styling, code blocks
+*/
+
+/* Auto light/dark syntax-highlight theme (no JS needed). */
+@import "highlight.js/styles/github.css" screen and
+  (prefers-color-scheme: light);
+@import "highlight.js/styles/github-dark.css" screen and
+  (prefers-color-scheme: dark);
+
+.chat-bubble-user {
+  margin-left: auto;
+  max-width: 75%;
+  width: fit-content;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  border-radius: 18px;
+  background-color: var(--bubble-user-bg, #e9e9eb);
+  color: var(--bubble-user-color, #1a1a1a);
+}
+
+.chat-message-assistant {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.message-actions {
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.chat-message-assistant:hover .message-actions,
+.chat-message-assistant:focus-within .message-actions {
+  opacity: 1;
+}
+
+.message-copy {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--message-copy-color, #666);
+  padding: 2px 4px;
+}
+
+.message-copy:hover {
+  color: var(--major-button-bg, #002752);
+}
+
+/* Markdown content (assistant messages only) */
+.markdown-content ul {
+  list-style: disc;
+  margin: 8px 0;
+  padding-left: 1.5em;
+}
+
+.markdown-content ol {
+  list-style: decimal;
+  margin: 8px 0;
+  padding-left: 1.5em;
+}
+
+.markdown-content li {
+  margin: 2px 0;
+}
+
+.markdown-content blockquote {
+  margin: 8px 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--blockquote-border, #ccc);
+  color: var(--blockquote-color, #666);
+}
+
+.markdown-content hr {
+  border: none;
+  border-top: 1px solid var(--hr-color, #ddd);
+  margin: 12px 0;
+}
+
+.markdown-content a {
+  color: var(--link-color, #0a66c2);
+}
+
+.markdown-content table {
+  border-collapse: collapse;
+  margin: 8px 0;
+  width: 100%;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid var(--table-border, #ccc);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.markdown-content th {
+  background-color: var(--table-header-bg, #f0f0f0);
+}
+
+.markdown-content tr:nth-child(even) td {
+  background-color: var(--table-zebra-bg, #f9f9f9);
+}
+
+.markdown-content code {
+  background-color: var(--inline-code-bg, #f0f0f0);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.9em;
+}
+
+/* Fenced code blocks render their own <pre><code>; don't double-chip that. */
+.markdown-content .code-block code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.code-block {
+  margin: 8px 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--code-block-border, #ddd);
+}
+
+.code-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  background-color: var(--code-block-header-bg, #eaeaea);
+  color: var(--code-block-header-color, #444);
+}
+
+.code-block-copy {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: inherit;
+}
+
+.code-block-copy:hover {
+  text-decoration: underline;
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 10px;
+  overflow-x: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chat-bubble-user {
+    --bubble-user-bg: #383838;
+    --bubble-user-color: #f0f0f0;
+  }
+
+  .message-copy {
+    --message-copy-color: #aaa;
+  }
+
+  .markdown-content blockquote {
+    --blockquote-border: #555;
+    --blockquote-color: #aaa;
+  }
+
+  .markdown-content hr {
+    --hr-color: #444;
+  }
+
+  .markdown-content a {
+    --link-color: #6cb6ff;
+  }
+
+  .markdown-content th,
+  .markdown-content td {
+    --table-border: #555;
+  }
+
+  .markdown-content th {
+    --table-header-bg: #333;
+  }
+
+  .markdown-content tr:nth-child(even) td {
+    --table-zebra-bg: #2a2a2a;
+  }
+
+  .markdown-content code {
+    --inline-code-bg: #333;
+  }
+
+  .code-block {
+    --code-block-border: #444;
+  }
+
+  .code-block-header {
+    --code-block-header-bg: #2a2a2a;
+    --code-block-header-color: #ccc;
+  }
+}
