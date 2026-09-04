@@ -148,7 +148,8 @@ export default function ChatPane({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Api-Key": import.meta.env.VITE_API_KEY,
+          // Local DEBUG version will require the key.
+          //"X-Api-Key": import.meta.env.VITE_API_KEY,
         },
         body: JSON.stringify({ threadId, messages: threadMessages }),
       });
